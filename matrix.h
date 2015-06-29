@@ -1,5 +1,13 @@
 #pragma once
 
+//disabled, as this code has only been tested with VS2013, which doesn't
+//support constexpr
+#ifdef _MSC_VER
+#	define CONSTEXPR
+#else
+#	define CONSTEXPR constexpr
+#endif
+
 #include <initializer_list>
 
 //Some helper code best moved to its own header.
@@ -42,7 +50,7 @@ namespace TypeMagic {
  * Generic matrix.
  *
  * Should work with any type specified for BaseType, so long as it has basic overloads.
- * Types which have 'interesting' mutations multiplication and dividsion _should_ work
+ * Types which have 'interesting' mutations multiplication and division _should_ work
  * I am not currently supporting mutation under addition because wtff.
  *
  * DownCastType is for intermediate operations where types might be accumulating type information.
