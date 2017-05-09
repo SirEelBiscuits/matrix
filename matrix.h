@@ -56,7 +56,7 @@ public:
 	static constexpr Matrix Identity() {
 		auto ret = Matrix{};
 		for(auto i = 0u; i < t_w; ++i)
-			ret(i, i) == BaseType{1};
+			ret(i, i) = BaseType{1};
 		return ret;
 	}
 
