@@ -1,14 +1,8 @@
 #pragma once
 
-//disabled, as this code has only been tested with VS2013, which doesn't
-//support constexpr
-#ifdef _MSC_VER
-#	define CONSTEXPR
-#else
-#	define CONSTEXPR constexpr
-#endif
-
 #include <initializer_list>
+#include <type_traits>
+#include <cmath>
 
 //Some helper code best moved to its own header.
 namespace TypeMagic {
@@ -17,7 +11,7 @@ namespace TypeMagic {
 	class pow {
 	public:
 		template<typename T, typename impl = pow<power - 1>>
-		static CONSTEXPR auto calculate(T const &in)
+		static constexpr auto calculate(T const &in)
 		-> decltype(in * impl::calculate(in)) {
 			return in * impl::calculate(in);
 		}
@@ -27,13 +21,13 @@ namespace TypeMagic {
 	class pow<1> {
 	public:
 		template<typename T>
-		static CONSTEXPR T calculate(T const &in) {
+		static constexpr T calculate(T const &in) {
 			return in;
 		}
 	};
 
 	template<typename T>
-	static CONSTEXPR auto invert(T const &in)
+	static constexpr auto invert(T const &in)
 	-> decltype(in/in/in) {
 		return in/in/in;
 	}
@@ -270,7 +264,7 @@ public:
 	//Constants
 
 	ENABLE_IF_SQUARE
-	static CONSTEXPR Matrix Identity() {
+	static constexpr Matrix Identity() {
 		Matrix ret;
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -278,7 +272,7 @@ public:
 		return ret;
 	}
 
-	static CONSTEXPR Matrix Zero() {
+	static constexpr Matrix Zero() {
 		Matrix ret;
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -330,12 +324,12 @@ public:
 
 //unary
 template<typename BaseType, unsigned t_w, unsigned t_h, typename DownCastType>
-CONSTEXPR Matrix<BaseType, t_w, t_h, DownCastType> operator+(Matrix<BaseType, t_w, t_h, DownCastType> const &op) {
+constexpr Matrix<BaseType, t_w, t_h, DownCastType> operator+(Matrix<BaseType, t_w, t_h, DownCastType> const &op) {
 	return op;
 }
 
 template<typename BaseType, unsigned t_w, unsigned t_h, typename DownCastType>
-CONSTEXPR Matrix<BaseType, t_w, t_h, DownCastType> operator-(Matrix<BaseType, t_w, t_h, DownCastType> const &op) {
+constexpr Matrix<BaseType, t_w, t_h, DownCastType> operator-(Matrix<BaseType, t_w, t_h, DownCastType> const &op) {
 	return Matrix<BaseType, t_w, t_h, DownCastType>::Zero() - op;
 }
 
@@ -348,7 +342,7 @@ template<
 	unsigned t_h,
 	typename DownCastType
 >
-CONSTEXPR auto operator*(Matrix<BaseType, t_w, t_h, DownCastType> const& left, ScalarType const &right)
+constexpr auto operator*(Matrix<BaseType, t_w, t_h, DownCastType> const& left, ScalarType const &right)
 -> Matrix<std::remove_const_t<decltype(left(0u, 0u) * right)>, t_w, t_h, DownCastType> {
 	Matrix<std::remove_const_t<decltype(left(0u, 0u) * right)>, t_w, t_h, DownCastType> ret;
 
@@ -366,7 +360,7 @@ template<
 	unsigned t_h,
 	typename DownCastType
 >
-CONSTEXPR auto operator*(ScalarType left, Matrix<BaseType, t_w, t_h, DownCastType> const& right)
+constexpr auto operator*(ScalarType left, Matrix<BaseType, t_w, t_h, DownCastType> const& right)
 -> Matrix<std::remove_const_t<decltype(left * right(0u, 0u))>, t_w, t_h, DownCastType> {
 	Matrix<std::remove_const_t<decltype(left * right(0u, 0u))>, t_w, t_h, DownCastType> ret;
 
@@ -383,7 +377,7 @@ template<
 	unsigned t_h,
 	typename DownCastType
 >
-CONSTEXPR auto operator/(Matrix<BaseType, t_w, t_h, DownCastType> const& left, ScalarType const &right)
+constexpr auto operator/(Matrix<BaseType, t_w, t_h, DownCastType> const& left, ScalarType const &right)
 -> Matrix<std::remove_const_t<decltype(left(0u, 0u) / right)>, t_w, t_h, DownCastType> {
 	Matrix<std::remove_const_t<decltype(left(0u, 0u) / right)>, t_w, t_h, DownCastType> ret;
 
@@ -396,7 +390,7 @@ CONSTEXPR auto operator/(Matrix<BaseType, t_w, t_h, DownCastType> const& left, S
 //arithmatic
 
 template<typename BaseType, unsigned t_w, unsigned t_h, typename DownCastType>
-CONSTEXPR Matrix<BaseType, t_w, t_h, DownCastType> operator+(
+constexpr Matrix<BaseType, t_w, t_h, DownCastType> operator+(
 	Matrix<BaseType, t_w, t_h, DownCastType> const &left,
 	Matrix<BaseType, t_w, t_h, DownCastType> const &right
 ) {
@@ -406,7 +400,7 @@ CONSTEXPR Matrix<BaseType, t_w, t_h, DownCastType> operator+(
 }
 
 template<typename BaseType, unsigned t_w, unsigned t_h, typename DownCastType>
-CONSTEXPR Matrix<BaseType, t_w, t_h, DownCastType> operator-(Matrix<BaseType, t_w, t_h, DownCastType> const &left, Matrix<BaseType, t_w, t_h, DownCastType> const &right) {
+constexpr Matrix<BaseType, t_w, t_h, DownCastType> operator-(Matrix<BaseType, t_w, t_h, DownCastType> const &left, Matrix<BaseType, t_w, t_h, DownCastType> const &right) {
 	auto ret = left;
 	ret -= right;
 	return ret;
@@ -421,7 +415,7 @@ template<
 	typename DownCastType,
 	typename DownCastType2
 >
-CONSTEXPR auto operator*(
+constexpr auto operator*(
 		Matrix<BaseType1, t_a, t_b, DownCastType> const &left,
 	   	Matrix<BaseType2, t_c, t_a, DownCastType2> const &right
 ) -> Matrix<
@@ -450,7 +444,7 @@ CONSTEXPR auto operator*(
 //comparison
 
 template<typename BaseType, unsigned t_w, unsigned t_h, typename DownCastType>
-CONSTEXPR bool operator==(Matrix<BaseType, t_w, t_h, DownCastType> const &left, Matrix<BaseType, t_w, t_h, DownCastType> const& right) {
+constexpr bool operator==(Matrix<BaseType, t_w, t_h, DownCastType> const &left, Matrix<BaseType, t_w, t_h, DownCastType> const& right) {
 	for(auto y = 0u; y < t_h; ++y)
 		for(auto x = 0u; x < t_w; ++x)
 			if(left(x,y) != right(x,y))
@@ -610,7 +604,7 @@ public:
 
 	//Constants
 
-	static CONSTEXPR Matrix Zero() {
+	static constexpr Matrix Zero() {
 		Matrix ret;
 		ret.x = BaseType(0);
 		ret.y = BaseType(0);
@@ -762,7 +756,7 @@ public:
 
 	//Constants
 
-	static CONSTEXPR Matrix Zero() {
+	static constexpr Matrix Zero() {
 		Matrix ret;
 		ret.x = BaseType(0);
 		ret.y = BaseType(0);
@@ -966,7 +960,7 @@ public:
 
 	//Constants
 
-	static CONSTEXPR Matrix Zero() {
+	static constexpr Matrix Zero() {
 		Matrix ret;
 		ret.x = BaseType(0);
 		ret.y = BaseType(0);
