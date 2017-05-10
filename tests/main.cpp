@@ -61,7 +61,7 @@ Tee_Test(test_basic_matrix_addition) {
 	}
 }
 
-Tee_Test(test_matrix_scaling) {
+Tee_Test(test_matrix_scaling_with_simple_types) {
 	using m3x3 = Matrix<float, 3, 3>;
 	m3x3 m{
 		1, 2, 3,
@@ -87,6 +87,10 @@ Tee_Test(test_matrix_scaling) {
 	Tee_SubTest(test_scaling_by_zero_zeros_matrix) {
 		assert(m * 0 == m3x3::Zero());
 	}
+}
+
+Tee_Test(test_matrix_scaling_with_mutating_types) {
+
 }
 
 int main() {
