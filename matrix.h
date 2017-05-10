@@ -26,24 +26,6 @@ public:
 		return data[x][y];
 	}
 
-	constexpr Matrix& operator+=(
-		Matrix const& other
-	) {
-		for(auto x = 0u; x < t_w; ++x)
-			for(auto y = 0u; y < t_h; ++y)
-				data[x][y] += other.data[x][y];
-		return *this;
-	}
-
-	constexpr Matrix& operator-=(
-		Matrix const& other
-	) {
-		for(auto x = 0u; x < t_w; ++x)
-			for(auto y = 0u; y < t_h; ++y)
-				data[x][y] -= other.data[x][y];
-		return *this;
-	}
-
 	// Static Constants
 	static constexpr Matrix Zero() {
 		return Matrix{};
@@ -88,8 +70,10 @@ constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator+ (
 	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
 	Matrix<BaseType, t_w, t_h, DowncastType> const& right
 ) {
-	auto ret = left;
-	ret += right;
+	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+	for(auto x = 0u; x < t_w; ++x)
+		for(auto y = 0u; y < t_h; ++y)
+			ret(x, y) = left(x, y) + right(x, y);
 	return ret;
 }
 
@@ -103,8 +87,10 @@ constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator- (
 	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
 	Matrix<BaseType, t_w, t_h, DowncastType> const& right
 ) {
-	auto ret = left;
-	ret -= right;
+	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+	for(auto x = 0u; x < t_w; ++x)
+		for(auto y = 0u; y < t_h; ++y)
+			ret(x, y) = left(x, y) - right(x, y);
 	return ret;
 }
 
