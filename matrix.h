@@ -18,11 +18,11 @@ public:
 				data[x][y] = *elem;
 	}
 
-	constexpr BaseType const operator()(unsigned x, unsigned y) const {
+	constexpr BaseType const& operator()(unsigned x, unsigned y) const {
 		return data[x][y];
 	}
 
-	constexpr BaseType operator()(unsigned x, unsigned y) {
+	constexpr BaseType& operator()(unsigned x, unsigned y) {
 		return data[x][y];
 	}
 
