@@ -108,6 +108,43 @@ constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator- (
 	return ret;
 }
 
+//Scalars
+template<
+	typename T,
+	typename BaseType,
+	int t_w,
+	int t_h,
+	typename DowncastType = BaseType
+>
+constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator* (
+	T const& left,
+	Matrix<BaseType, t_w, t_h, DowncastType> const& right
+) {
+	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+	for(auto x = 0u; x < t_w; ++x)
+		for(auto y = 0u; y < t_h; ++y)
+			ret(x, y) = left * right(x, y);
+	return ret;
+}
+
+template<
+	typename T,
+	typename BaseType,
+	int t_w,
+	int t_h,
+	typename DowncastType = BaseType
+>
+constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator* (
+	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
+	T const& right
+) {
+	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+	for(auto x = 0u; x < t_w; ++x)
+		for(auto y = 0u; y < t_h; ++y)
+			ret(x, y) = left(x, y) * right;
+	return ret;
+}
+
 //Comparison operators
 
 template<
