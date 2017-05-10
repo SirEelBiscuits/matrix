@@ -28,7 +28,6 @@ Tee_Test(test_matrix_constants) {
 	}
 }
 
-
 Tee_Test(test_basic_matrix_addition) {
 	auto m = Matrix<float, 2, 2>{1, 2, 3, 4};
 	auto m2 = Matrix<float, 2, 2>{5, 6, 7, 8};
@@ -89,8 +88,57 @@ Tee_Test(test_matrix_scaling_with_simple_types) {
 	}
 }
 
-Tee_Test(test_matrix_scaling_with_mutating_types) {
+template<int e_t>
+class Meters {
+public:
+	float val{};
 
+	Meters() = default;
+	Meters& operator=(Meters other) {
+		val = other.val;
+	}
+};
+
+template<int e1, int e2>
+Meters<e1 + e2>
+operator*(Meters<e1> const& left, Meters<e2> const& right) {
+	return Meters<e1 + e2>{left.val * right.val};
+}
+
+template<int e1>
+bool
+operator==(Meters<e1> const& left, Meters<e1> const& right) {
+	return left.val == right.val;
+}
+
+template<int e1>
+bool
+operator!=(Meters<e1> const& left, Meters<e1> const& right) {
+	return left.val != right.val;
+}
+
+Tee_Test(test_matrix_scaling_with_mutating_types) {
+	using m2x2 = Matrix<Meters<1>, 2, 2>;
+	m2x2 m{Meters<1>{1}, Meters<1>{2}, Meters<1>{3}, Meters<1>{4}};
+
+	Tee_SubTest(test_scaling_simple) {
+		auto m2 = Meters<1>{2} * m;
+		for(auto x = 0u; x < 2; ++x)
+			for(auto y = 0u; y < 2; ++y)
+				assert((m(x, y) * Meters<1>{2}).val == m2(x, y).val);
+	}
+
+	Tee_SubTest(test_scaling_is_commutative) {
+		assert(m * Meters<2>{2} == Meters<2>{2} * m);
+	}
+
+	Tee_SubTest(test_scaling_is_associative) {
+		assert((Meters<3>{3} * m) * Meters<0>{4} == Meters<3>{3} * (m * Meters<0>{4}));
+	}
+
+	Tee_SubTest(test_scaling_by_zero_zeros_matrix) {
+		assert(m * Meters<0>{0} == m2x2::Zero());
+	}
 }
 
 int main() {
