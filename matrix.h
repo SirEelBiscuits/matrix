@@ -102,11 +102,17 @@ template<
 	int t_h,
 	typename DowncastType = BaseType
 >
-constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator* (
+constexpr auto operator* (
 	T const& left,
 	Matrix<BaseType, t_w, t_h, DowncastType> const& right
-) {
-	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+)
+{
+	auto ret = Matrix<
+		std::remove_const_t<decltype(left * right(0,0))>,
+		t_w,
+		t_h,
+		DowncastType
+	>{};
 	for(auto x = 0u; x < t_w; ++x)
 		for(auto y = 0u; y < t_h; ++y)
 			ret(x, y) = left * right(x, y);
@@ -120,11 +126,17 @@ template<
 	int t_h,
 	typename DowncastType = BaseType
 >
-constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator* (
+constexpr auto operator* (
 	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
 	T const& right
-) {
-	auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+)
+{
+	auto ret = Matrix<
+		std::remove_const_t<decltype(left(0,0) * right)>,
+		t_w,
+		t_h,
+		DowncastType
+	>{};
 	for(auto x = 0u; x < t_w; ++x)
 		for(auto y = 0u; y < t_h; ++y)
 			ret(x, y) = left(x, y) * right;
