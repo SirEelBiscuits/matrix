@@ -61,6 +61,34 @@ Tee_Test(test_basic_matrix_addition) {
 	}
 }
 
+Tee_Test(test_matrix_scaling) {
+	using m3x3 = Matrix<float, 3, 3>;
+	m3x3 m{
+		1, 2, 3,
+		4, 5, 6,
+		7, 8, 9
+	};
+
+	Tee_SubTest(test_scaling_simple) {
+		auto m2 = 3 * m;
+		for(auto x = 0u; x < 3; ++x)
+			for(auto y = 0u; y < 3; ++y)
+				assert(m(x, y) * 3 == m2(x, y));
+	}
+
+	Tee_SubTest(test_scaling_is_commutative) {
+		assert(m * 2 == 2 * m);
+	}
+
+	Tee_SubTest(test_scaling_is_associative) {
+		assert((3 * m) * 4 == 3 * (m * 4));
+	}
+
+	Tee_SubTest(test_scaling_by_zero_zeros_matrix) {
+		assert(m * 0 == m3x3::Zero());
+	}
+}
+
 int main() {
 	int successes;
 	vector<string> fails;
