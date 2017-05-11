@@ -182,8 +182,10 @@ Tee_Test(test_matrix_scaling_with_mutating_types) {
 }
 
 Tee_Test(test_matrix_matrix_multiplication) {
-	Matrix<float, 2, 2> m2x2 {4, 2, 8, 1};
-	Matrix<float, 2, 2> m2x2ii {7, 3, 4, 9};
+	Matrix<float, 2, 2> m2x2 {4, 2,
+	                          8, 1};
+	Matrix<float, 2, 2> m2x2ii {7, 3,
+	                            4, 9};
 
 	Matrix<float, 3, 2> m3x2 {3, 8, 2, 4, 8, 0};
 	Matrix<float, 1, 2> v {2, 2};
@@ -191,34 +193,33 @@ Tee_Test(test_matrix_matrix_multiplication) {
 
 	Tee_SubTest(test_basic_multiplication) {
 		auto m = m2x2 * m2x2ii;
-		assert(m == Matrix<float, 2, 2>{34, 30, 60, 33});
+		assert((m == Matrix<float, 2, 2>{36, 30, 60, 33}));
 	}
 
 	Tee_SubTest(test_mismatched_size_multiplication) {
 		auto v2 = m2x2 * v;
-		assert(v2 == Matrix<float, 1, 2> {12, 18});
+		assert((v2 == Matrix<float, 1, 2> {12, 18}));
 		auto m2x2iii = m2x2 * m3x2;
 		assert(m2x2iii(0,0) == 20);
 	}
 
 	Tee_SubTest(test_associativity) {
 		assert((m2x2 * m2x2ii) * v == m2x2 * (m2x2ii * v));
-		assert((m3x2 *  m3x2.Transpose()) * v3 == m3x2 * (m3x2.Transpose() * v3));
+		assert((m3x2.Transpose() *  m3x2) * v3 == m3x2.Transpose() * (m3x2 * v3));
 	}
 
 	Tee_SubTest(test_identity_multiplication) {
-		assert(m2x2 * Matrix<float, 2, 2>::Identity() == m2x2);
-		assert(m2x2ii * Matrix<float, 2, 2>::Identity() == m2x2ii);
-		assert(
-			m3x2 * m3x2.Transpose() * Matrix<float, 3, 3>::Identity()
-			== m3x2 * m3x2.Transpose()
-		);
+		assert((m2x2 * Matrix<float, 2, 2>::Identity() == m2x2));
+		assert((m2x2ii * Matrix<float, 2, 2>::Identity() == m2x2ii));
+		assert((
+			m3x2.Transpose() * m3x2 * Matrix<float, 3, 3>::Identity()
+			== m3x2.Transpose() * m3x2
+		));
 	}
 
-	Tee_Subtest(test_zero_multiplication) {
+	Tee_SubTest(test_zero_multiplication) {
 		assert(m2x2 * decltype(m2x2)::Zero() == decltype(m2x2)::Zero());
 		assert(m2x2ii * decltype(m2x2ii)::Zero() == decltype(m2x2ii)::Zero());
-		assert(m3x2 * decltype(m3x2)::Zero() == decltype(m3x2)::Zero());
 	}
 }
 
