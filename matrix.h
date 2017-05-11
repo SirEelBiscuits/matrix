@@ -55,6 +55,16 @@ private:
 	BaseType data[t_w][t_h]{};
 };
 
+template<typename T>
+struct is_matrix {
+	static const bool value = false;
+};
+
+template<typename BaseType, int t_w, int t_h, typename DowncastType>
+struct is_matrix<Matrix<BaseType, t_w, t_h, DowncastType>> {
+	static const bool value = true;
+};
+
 // unary operators
 template<
 	typename BaseType,
@@ -106,6 +116,7 @@ constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator- (
 //Scalars
 template<
 	typename T,
+	typename = std::enable_if_t<!is_matrix<T>::value, T>,
 	typename BaseType,
 	int t_w,
 	int t_h,
@@ -130,6 +141,7 @@ constexpr auto operator* (
 
 template<
 	typename T,
+	typename = std::enable_if_t<!is_matrix<T>::value, T>,
 	typename BaseType,
 	int t_w,
 	int t_h,
@@ -138,8 +150,7 @@ template<
 constexpr auto operator* (
 	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
 	T const& right
-)
-{
+) {
 	auto ret = Matrix<
 		std::remove_const_t<decltype(left(0,0) * right)>,
 		t_w,
@@ -149,6 +160,32 @@ constexpr auto operator* (
 	for(auto x = 0u; x < t_w; ++x)
 		for(auto y = 0u; y < t_h; ++y)
 			ret(x, y) = left(x, y) * right;
+	return ret;
+}
+
+//Matrix operations
+template<
+	typename BaseTypeL,
+	typename BaseTypeR,
+	int t_h,
+	int t_wh,
+	int t_w,
+	typename DowncastType
+>
+constexpr auto operator* (
+	Matrix<BaseTypeL, t_wh, t_h, DowncastType> const& left,
+	Matrix<BaseTypeR, t_w, t_wh, DowncastType> const& right
+) {
+	auto ret = Matrix<
+		std::remove_const_t<decltype(left(0,0) * right(0,0))>,
+		t_w,
+		t_h,
+		DowncastType
+	>{};
+	for(auto xTarget = 0u; xTarget < t_w; ++xTarget)
+		for(auto yTarget = 0u; yTarget < t_h; ++yTarget)
+			for(auto i = 0u; i < t_wh; ++i)
+				ret(xTarget, yTarget) += left(i, yTarget) * right(xTarget, i);
 	return ret;
 }
 
