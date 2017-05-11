@@ -162,3 +162,20 @@ constexpr bool operator== (
 	return true;
 }
 
+template<
+	typename BaseType,
+	int t_w,
+	int t_h,
+	typename DowncastType
+>
+constexpr bool operator!= (
+	Matrix<BaseType, t_w, t_h, DowncastType> const& left,
+	Matrix<BaseType, t_w, t_h, DowncastType> const& right
+) {
+	for(auto x = 0u; x < t_w; ++x)
+		for(auto y = 0u; y < t_h; ++y)
+			if(left(x, y) == right(x, y))
+				return false;
+	return true;
+}
+
