@@ -26,6 +26,15 @@ public:
 		return data[x][y];
 	}
 
+	constexpr Matrix<BaseType, t_h, t_w, DowncastType> Transpose() const {
+		Matrix<BaseType, t_h, t_w, DowncastType> ret{};
+
+		for(auto x = 0u; x < t_w; ++x)
+			for(auto y = 0u; y < t_h; ++y)
+				ret(y,x) = data[x][y];
+		return ret;
+	}
+
 	// Static Constants
 	static constexpr Matrix Zero() {
 		return Matrix{};
