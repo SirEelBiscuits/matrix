@@ -48,6 +48,26 @@ Tee_Test(test_matrix_comparison_operators) {
 	}
 }
 
+Tee_Test(test_matrix_transpose) {
+	Matrix<float, 1, 4> m1 {1, 2, 3, 4};
+	Matrix<float, 4, 1> m2 {1, 2, 3, 4};
+	Matrix<float, 2, 3> m2x3 {1, 2, 2, 4, 3, 6};
+
+	Tee_SubTest(test_basic_transpose_types) {
+		assert(m1.Transpose() == m2);
+
+		auto m3x2 = m2x3.Transpose();
+		for(auto x = 0u; x < 3; ++x)
+			for(auto y = 0u; y < 2; ++y)
+				assert(m3x2(x, y) == (x+1) * (y+1));
+	}
+
+	Tee_SubTest(test_transpose_is_involuting) {
+		assert(m1.Transpose().Transpose() == m1);
+		assert(m2x3.Transpose().Transpose() == m2x3);
+	}
+}
+
 Tee_Test(test_basic_matrix_addition) {
 	auto m = Matrix<float, 2, 2>{1, 2, 3, 4};
 	auto m2 = Matrix<float, 2, 2>{5, 6, 7, 8};
