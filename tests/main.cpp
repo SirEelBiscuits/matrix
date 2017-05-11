@@ -28,6 +28,26 @@ Tee_Test(test_matrix_constants) {
 	}
 }
 
+Tee_Test(test_matrix_comparison_operators) {
+	Matrix<float, 2, 2> m1 {1, 2, 3, 4};
+	Matrix<float, 2, 2> m2 {1, 2, 3, 4};
+	Matrix<float, 2, 2> m3 {4, 3, 2, 1};
+	Tee_SubTest(test_compare_equals) {
+		assert(m1 == m2);
+		assert(!(m1 == m3));
+	}
+
+	Tee_SubTest(test_compare_not_equals) {
+		assert(m1 != m3);
+		assert(!(m1 != m2));
+	}
+
+	Tee_SubTest(test_comparison_commutativity) {
+		assert((m1 == m2) == (m2 == m1));
+		assert((m1 != m3) == (m3 != m1));
+	}
+}
+
 Tee_Test(test_basic_matrix_addition) {
 	auto m = Matrix<float, 2, 2>{1, 2, 3, 4};
 	auto m2 = Matrix<float, 2, 2>{5, 6, 7, 8};
