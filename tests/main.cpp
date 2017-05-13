@@ -138,15 +138,47 @@ public:
 	float val{};
 
 	Meters() = default;
+	Meters(float x) : val(x) {}
+	Meters(int x) : val(x) {}
 	Meters& operator=(Meters other) {
 		val = other.val;
 	}
 };
 
+template<int e>
+Meters<e>
+operator-(Meters<e> const& left, Meters<e> const& right) {
+	return Meters<e>{left.val-right.val};
+}
+
+template<int e>
+Meters<e>
+operator+(Meters<e> const& left, Meters<e> const& right) {
+	return Meters<e>{left.val+right.val};
+}
+
+template<int e>
+Meters<e>
+operator-(Meters<e> const& op) {
+	return Meters<e>{-op.val};
+}
+
 template<int e1, int e2>
 Meters<e1 + e2>
 operator*(Meters<e1> const& left, Meters<e2> const& right) {
 	return Meters<e1 + e2>{left.val * right.val};
+}
+
+template<int e>
+auto
+operator/(float const& left, Meters<e> const& right) {
+	return Meters<-e>{1/right.val};
+}
+
+template<int e1, int e2>
+auto
+operator/(Meters<e1> const& left, Meters<e2> const& right) {
+	return Meters<e1-e2>{left.val/right.val};
 }
 
 template<int e1>
@@ -233,9 +265,9 @@ Tee_Test(test_matrix_inverse) {
 	using SuperGeneric::Matrix;
 	using m1x1 = Matrix<float, 1, 1>;
 	using m2x2 = Matrix<float, 2, 2>;
-	Matrix<float, 1, 1> three{ 3 };
-	Matrix<float, 2, 2> two{2, 0, 0, 2};
-	Matrix<float, 2, 2> m{1, 2, 3, 4};
+	auto three = m1x1{ 3 };
+	auto two   = m2x2{2, 0, 0, 2};
+	auto m     = m2x2{1, 2, 3, 4};
 
 	Tee_SubTest(test_one_by_one_matrix_inverse) {
 		assert(three.Inverse() == m1x1{1.0f/3});
@@ -262,6 +294,48 @@ Tee_Test(test_matrix_inverse) {
 		assert(three * three.Inverse() == m1x1::Identity());
 		assert(two * two.Inverse() == m2x2::Identity());
 		assert(m * m.Inverse() == m2x2::Identity());
+	}
+}
+
+Tee_Test(test_matrix_inverse_complex) {
+	using SuperGeneric::Matrix;
+	using m1x1Scalar = Matrix<Meters<0>, 1, 1>;
+	using m1x1 = Matrix<Meters<1>, 1, 1>;
+	using m1x1Inv = Matrix<Meters<-1>, 1, 1>;
+	using m2x2Scalar = Matrix<Meters<0>, 2, 2>;
+	using m2x2 = Matrix<Meters<1>, 2, 2>;
+	using m2x2Inv = Matrix<Meters<-1>, 2, 2>;
+	auto three = m1x1{3};
+	auto two   = m2x2{2, 0, 0, 2};
+	auto m     = m2x2{1, 2, 3, 4};
+
+	Tee_SubTest(test_one_by_one_matrix_inverse) {
+		assert(three.Inverse() == m1x1Inv{1.0f/3});
+	}
+
+	Tee_SubTest(test_two_Square_matrix_inverse_simple) {
+		auto twoInv = m2x2Inv{0.5f, 0, 0, 0.5f};
+		auto ti = two.Inverse();
+		assert(two.Inverse() == twoInv);
+	}
+
+	Tee_SubTest(test_two_square_matrix_inverse) {
+		auto i = m.Inverse();
+		auto mInv = m2x2Inv{-2.0f, 1.0f, 1.5f, -0.5f};
+		assert(i == mInv);
+	}
+
+	Tee_SubTest(test_identity_inverts_to_identity) {
+		//NB, some types don't really have a valid Identity matrix
+		//type mutations invalidate identity operations
+		assert(m1x1Scalar::Identity().Inverse() == m1x1Scalar::Identity());
+		assert(m2x2Scalar::Identity().Inverse() == m2x2Scalar::Identity());
+	}
+
+	Tee_SubTest(test_m_mult_inverse_is_identity) {
+		assert(three * three.Inverse() == m1x1Scalar::Identity());
+		assert(two * two.Inverse() == m2x2Scalar::Identity());
+		assert(m * m.Inverse() == m2x2Scalar::Identity());
 	}
 }
 
