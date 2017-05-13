@@ -11,7 +11,7 @@ using namespace std;
 
 Tee_Test(test_matrix_constants) {
 	Tee_SubTest(test_matrix_identity) {
-		auto i = Matrix<float, 4, 4>::Identity();
+		auto i = SuperGeneric::Matrix<float, 4, 4>::Identity();
 
 		for(auto x = 0u; x < 4; ++x)
 			for(auto y = 0u; y < 4; ++y)
@@ -21,7 +21,7 @@ Tee_Test(test_matrix_constants) {
 	}
 
 	Tee_SubTest(test_matrix_zero) {
-		auto z = Matrix<float, 4, 4>::Zero();
+		auto z = SuperGeneric::Matrix<float, 4, 4>::Zero();
 		for(auto x = 0u; x < 4; ++x)
 			for(auto y = 0u; y < 4; ++y)
 				assert(z(x, y) == 0.0f);
@@ -29,6 +29,7 @@ Tee_Test(test_matrix_constants) {
 }
 
 Tee_Test(test_matrix_comparison_operators) {
+	using SuperGeneric::Matrix;
 	Matrix<float, 2, 2> m1 {1, 2, 3, 4};
 	Matrix<float, 2, 2> m2 {1, 2, 3, 4};
 	Matrix<float, 2, 2> m3 {4, 3, 2, 1};
@@ -49,6 +50,7 @@ Tee_Test(test_matrix_comparison_operators) {
 }
 
 Tee_Test(test_matrix_transpose) {
+	using SuperGeneric::Matrix;
 	Matrix<float, 1, 4> m1 {1, 2, 3, 4};
 	Matrix<float, 4, 1> m2 {1, 2, 3, 4};
 	Matrix<float, 2, 3> m2x3 {1, 2, 2, 4, 3, 6};
@@ -69,6 +71,7 @@ Tee_Test(test_matrix_transpose) {
 }
 
 Tee_Test(test_basic_matrix_addition) {
+	using SuperGeneric::Matrix;
 	auto m = Matrix<float, 2, 2>{1, 2, 3, 4};
 	auto m2 = Matrix<float, 2, 2>{5, 6, 7, 8};
 	auto m3 = Matrix<float, 2, 2>{1, 3, 6, 7};
@@ -101,6 +104,7 @@ Tee_Test(test_basic_matrix_addition) {
 }
 
 Tee_Test(test_matrix_scaling_with_simple_types) {
+	using SuperGeneric::Matrix;
 	using m3x3 = Matrix<float, 3, 3>;
 	m3x3 m{
 		1, 2, 3,
@@ -158,6 +162,7 @@ operator!=(Meters<e1> const& left, Meters<e1> const& right) {
 }
 
 Tee_Test(test_matrix_scaling_with_mutating_types) {
+	using SuperGeneric::Matrix;
 	using m2x2 = Matrix<Meters<1>, 2, 2>;
 	m2x2 m{Meters<1>{1}, Meters<1>{2}, Meters<1>{3}, Meters<1>{4}};
 
@@ -182,6 +187,7 @@ Tee_Test(test_matrix_scaling_with_mutating_types) {
 }
 
 Tee_Test(test_matrix_matrix_multiplication) {
+	using SuperGeneric::Matrix;
 	Matrix<float, 2, 2> m2x2 {4, 2,
 	                          8, 1};
 	Matrix<float, 2, 2> m2x2ii {7, 3,
@@ -224,7 +230,39 @@ Tee_Test(test_matrix_matrix_multiplication) {
 }
 
 Tee_Test(test_matrix_inverse) {
+	using SuperGeneric::Matrix;
+	using m1x1 = Matrix<float, 1, 1>;
+	using m2x2 = Matrix<float, 2, 2>;
+	Matrix<float, 1, 1> three{ 3 };
+	Matrix<float, 2, 2> two{2, 0, 0, 2};
+	Matrix<float, 2, 2> m{1, 2, 3, 4};
 
+	Tee_SubTest(test_one_by_one_matrix_inverse) {
+		assert(three.Inverse() == m1x1{1.0f/3});
+	}
+
+	Tee_SubTest(test_two_Square_matrix_inverse_simple) {
+		auto twoInv = m2x2{0.5f, 0, 0, 0.5f};
+		auto ti = two.Inverse();
+		assert(two.Inverse() == twoInv);
+	}
+
+	Tee_SubTest(test_two_square_matrix_inverse) {
+		auto i = m.Inverse();
+		Matrix<float, 2, 2> mInv {-2.0f, 1.0f, 1.5f, -0.5f};
+		assert(i == mInv);
+	}
+
+	Tee_SubTest(test_identity_inverts_to_identity) {
+		assert(m1x1::Identity().Inverse() == m1x1::Identity());
+		assert(m2x2::Identity().Inverse() == m2x2::Identity());
+	}
+
+	Tee_SubTest(test_m_mult_inverse_is_identity) {
+		assert(three * three.Inverse() == m1x1::Identity());
+		assert(two * two.Inverse() == m2x2::Identity());
+		assert(m * m.Inverse() == m2x2::Identity());
+	}
 }
 
 int main() {
