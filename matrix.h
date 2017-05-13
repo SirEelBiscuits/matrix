@@ -12,8 +12,7 @@ namespace SuperGeneric {
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	> class Matrix {
 	public:
 		constexpr Matrix() = default;
@@ -32,8 +31,8 @@ namespace SuperGeneric {
 			return data[x][y];
 		}
 
-		constexpr Matrix<BaseType, t_h, t_w, DowncastType> Transpose() const {
-			Matrix<BaseType, t_h, t_w, DowncastType> ret{};
+		constexpr Matrix<BaseType, t_h, t_w> Transpose() const {
+			Matrix<BaseType, t_h, t_w> ret{};
 
 			for(auto x = 0u; x < t_w; ++x)
 				for(auto y = 0u; y < t_h; ++y)
@@ -70,8 +69,8 @@ namespace SuperGeneric {
 		static const bool value = false;
 	};
 
-	template<typename BaseType, int t_w, int t_h, typename DowncastType>
-	struct is_matrix<Matrix<BaseType, t_w, t_h, DowncastType>> {
+	template<typename BaseType, int t_w, int t_h>
+	struct is_matrix<Matrix<BaseType, t_w, t_h>> {
 		static const bool value = true;
 	};
 
@@ -79,27 +78,25 @@ namespace SuperGeneric {
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
-	constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator- (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& op
+	constexpr Matrix<BaseType, t_w, t_h> operator- (
+		Matrix<BaseType, t_w, t_h> const& op
 	) {
-		return Matrix<BaseType, t_w, t_h, DowncastType>::Zero() - op;
+		return Matrix<BaseType, t_w, t_h>::Zero() - op;
 	}
 
 	// binary operators
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
-	constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator+ (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& left,
-		Matrix<BaseType, t_w, t_h, DowncastType> const& right
+	constexpr Matrix<BaseType, t_w, t_h> operator+ (
+		Matrix<BaseType, t_w, t_h> const& left,
+		Matrix<BaseType, t_w, t_h> const& right
 	) {
-		auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+		auto ret = Matrix<BaseType, t_w, t_h>{};
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
 				ret(x, y) = left(x, y) + right(x, y);
@@ -109,14 +106,13 @@ namespace SuperGeneric {
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
-	constexpr Matrix<BaseType, t_w, t_h, DowncastType> operator- (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& left,
-		Matrix<BaseType, t_w, t_h, DowncastType> const& right
+	constexpr Matrix<BaseType, t_w, t_h> operator- (
+		Matrix<BaseType, t_w, t_h> const& left,
+		Matrix<BaseType, t_w, t_h> const& right
 	) {
-		auto ret = Matrix<BaseType, t_w, t_h, DowncastType>{};
+		auto ret = Matrix<BaseType, t_w, t_h>{};
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
 				ret(x, y) = left(x, y) - right(x, y);
@@ -129,19 +125,17 @@ namespace SuperGeneric {
 		typename = std::enable_if_t<!is_matrix<T>::value, T>,
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
 	constexpr auto operator* (
 		T const& left,
-		Matrix<BaseType, t_w, t_h, DowncastType> const& right
+		Matrix<BaseType, t_w, t_h> const& right
 	)
 	{
 		auto ret = Matrix<
 			std::remove_const_t<decltype(left * right(0,0))>,
 			t_w,
-			t_h,
-			DowncastType
+			t_h
 		>{};
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -154,18 +148,16 @@ namespace SuperGeneric {
 		typename = std::enable_if_t<!is_matrix<T>::value, T>,
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
 	constexpr auto operator* (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& left,
+		Matrix<BaseType, t_w, t_h> const& left,
 		T const& right
 	) {
 		auto ret = Matrix<
 			std::remove_const_t<decltype(left(0,0) * right)>,
 			t_w,
-			t_h,
-			DowncastType
+			t_h
 		>{};
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -179,23 +171,22 @@ namespace SuperGeneric {
 		typename BaseTypeR,
 		int t_h,
 		int t_wh,
-		int t_w,
-		typename DowncastType
+		int t_w
 	>
 	constexpr auto operator* (
-		Matrix<BaseTypeL, t_wh, t_h, DowncastType> const& left,
-		Matrix<BaseTypeR, t_w, t_wh, DowncastType> const& right
+		Matrix<BaseTypeL, t_wh, t_h> const& left,
+		Matrix<BaseTypeR, t_w, t_wh> const& right
 	) {
 		auto ret = Matrix<
 			std::remove_const_t<decltype(left(0,0) * right(0,0))>,
 			t_w,
-			t_h,
-			DowncastType
+			t_h
 		>{};
 		for(auto xTarget = 0u; xTarget < t_w; ++xTarget)
 			for(auto yTarget = 0u; yTarget < t_h; ++yTarget)
 				for(auto i = 0u; i < t_wh; ++i)
-					ret(xTarget, yTarget) += left(i, yTarget) * right(xTarget, i);
+					ret(xTarget, yTarget) = ret(xTarget, yTarget)
+						+ left(i, yTarget) * right(xTarget, i);
 		return ret;
 	}
 
@@ -204,12 +195,11 @@ namespace SuperGeneric {
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType = BaseType
+		int t_h
 	>
 	constexpr bool operator== (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& left,
-		Matrix<BaseType, t_w, t_h, DowncastType> const& right
+		Matrix<BaseType, t_w, t_h> const& left,
+		Matrix<BaseType, t_w, t_h> const& right
 	) {
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -221,12 +211,11 @@ namespace SuperGeneric {
 	template<
 		typename BaseType,
 		int t_w,
-		int t_h,
-		typename DowncastType
+		int t_h
 	>
 	constexpr bool operator!= (
-		Matrix<BaseType, t_w, t_h, DowncastType> const& left,
-		Matrix<BaseType, t_w, t_h, DowncastType> const& right
+		Matrix<BaseType, t_w, t_h> const& left,
+		Matrix<BaseType, t_w, t_h> const& right
 	) {
 		for(auto x = 0u; x < t_w; ++x)
 			for(auto y = 0u; y < t_h; ++y)
@@ -243,7 +232,7 @@ namespace SuperGeneric {
 	template<typename T>
 	constexpr auto Invert(Matrix<T, 2, 2> const& in) {
 		auto detInv = 1 / (in(0,0) * in(1,1) - in(1,0) * in(0,1));
-		Matrix<float, 2, 2> intermediate {in(1,1), -in(1,0), -in(0,1), in(0,0)};
+		Matrix<T, 2, 2> intermediate {in(1,1), -in(1,0), -in(0,1), in(0,0)};
 		return detInv * intermediate;
 	}
 }
