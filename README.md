@@ -1,15 +1,70 @@
 Matrix.h
 ========
 
-A very special generic matrix class
+[![Build Status](https://api.travis-ci.org/SirEelBiscuits/matrix.svg?branch=master)](https://travis-ci.org/SirEelBiscuits/matrix)
 
-Should work with any type specified for BaseType, so long as it has basic overloads. Types which have 'interesting' mutations multiplication and division _should_ work I am not currently supporting mutation under addition because wtff. DownCastType is for intermediate operations where types might be accumulating type information. this isn't permissable in C++ usually, but the matrix will maintain return type validity, and just use this value internally. If it compiles with the default, the default is fine!
+The purpose of matrix is to provide a generic matrix, allowing for any data
+type for individual elements, so long as the requisite operators are defined
+on those types.
 
-Example for when DownCastType is needed:
+Notably, types which may be multiplied resulting in a different type work
+with Matrix.
 
-BaseType = T<int m_pow> where m_pow is the exponent of the meters unit. Multiplying two together will result in summing their m_pow to maintain the unit validity. If these use float as a storage type, and can be cast to and from, then DownCastType should be float. If there is no such type, make one as a helper type to use here. The DownCastType must have its operators return the same type, always.
+Author
+------
 
-To Do
+J Thatcher - @SirEelBiscuits - jameson@bluescreenofdoom.com
+
+Prerequisites
+-------------
+
+- A C++14 compatible compiler
+
+Usage
 -----
 
-Fill out this damn file.
+To use the matrix, `#include "matrix.h"`, and create matrices as needed:
+
+```cpp
+using SuperGeneric::Matrix;
+auto m = Matrix<float, 2, 2> { 1, 3, 5, 2 };
+```
+
+individual elements may be read and written via `operator()` like so:
+
+```cpp
+auto x = 0u, y = 1u;
+m(x, y) = 3.5f;
+```
+
+Addition, multiplication, and scalar operations are defined where valid,
+invalid operations, including multiplying matrices of inapproporiate
+dimensions, will produce compile errors.
+
+There are functions to get the identity and zero matrices
+defined statically on square matrix types:
+
+```cpp
+SuperGeneric::Matrix<float, 2, 2>::Identity();
+SuperGeneric::Matrix<float, 3, 3>::Zero();
+```
+
+One can also retrieve the inverse of 1x1 and 2x2 matrices
+
+```cpp
+m.Inverse()
+//or
+Invert(m);
+```
+
+Building Tests
+--------------
+
+The included tests can be built with the included makefile. `make all test`
+will build and run the tests.
+
+Future Work
+-----------
+
+- Make the matrix type mutable
+- Add inverse functions for order 3 and greater matrices
