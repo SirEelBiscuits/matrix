@@ -224,6 +224,8 @@ namespace SuperGeneric {
 		return true;
 	}
 
+	//Matrix operations (no sane overloads for these!)
+
 	template<typename T>
 	constexpr auto Invert(Matrix<T, 1, 1> const& in) {
 		return Matrix<TypeMagic::Invert<T>, 1, 1> { 1 / in(0,0) };
